@@ -1,0 +1,12 @@
+# Deployment files
+*.egg-info
+dist
+
+# Environment files
+site-packages
+*.py[cod]
+
+# OS-specific files
+.DS_Store
+Desktop.ini
+Thumbs.db
