@@ -104,9 +104,9 @@ def highlight_traceback_lines(iterable, cwd=None):
 
             path, lineno, func = match.group(1), match.group(2), match.group(3)
 
-            included = path.startswith(cwd)
+            included = os.path.abspath(path).startswith(cwd)
             if included:
-                pathindex = len(cwd)
+                pathindex = len(cwd) if path.startswith(cwd) else 0
                 if path[pathindex] == os.path.sep:
                     pathindex += 1
             else:
