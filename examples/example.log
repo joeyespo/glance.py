@@ -1,0 +1,10 @@
+Some output text.
+Followed by a printed exception.
+Run `glance < example.log` to see this colorized.
+
+Traceback (most recent call last):
+  File "example.py", line 8, in <module>
+    ok()
+  File "example.py", line 5, in ok
+    print(1 / 0)
+ZeroDivisionError: division by zero
