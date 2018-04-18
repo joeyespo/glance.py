@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import os
 import re
@@ -9,18 +9,24 @@ from colorama import Fore, Style, init
 
 from runner import run
 
+try:
+    String = basestring
+except NameError:
+    String = str
+
 
 LOCATION_PATTERN = '  File "{}", line {}, in {}'
 LOCATION_RE = re.compile(LOCATION_PATTERN.format(
     r'(.*)', r'(\d+)', r'(.*)'))
 
 
-EXAMPLE = """
-..Some output text.
-..Traceback (most recent call last):
-..  File "C:\Users\Joe\Development\Repositories\glance\glanceback.py", line 12, in <module>
-..    highlight_tracebacks()
-..TypeError: highlight_tracebacks() takes exactly 1 argument (0 given)
+EXAMPLE = """\
+Some output text.
+Followed by a printed exception.
+Traceback (most recent call last):
+  File "glanceback.py", line 12, in <module>
+    highlight_tracebacks()
+TypeError: highlight_tracebacks() takes exactly 1 argument (0 given)
 """
 
 
@@ -56,9 +62,9 @@ def highlight(s, style='', start=0, end=None, bright=True, reset=None):
 
 
 def highlight_tracebacks(stream_or_string, cwd=None, encoding='utf-8'):
-    if isinstance(stream_or_string, basestring):
+    if isinstance(stream_or_string, String):
         string = stream_or_string
-        if isinstance(string, str):
+        if hasattr(string, 'decode'):
             string = string.decode(encoding)
         stream = StringIO(string)
     else:
@@ -87,7 +93,7 @@ def highlight_traceback_lines(iterable, cwd=None):
 
         # Find and highlight header
         while True:
-            line = lines.next()
+            line = next(lines)
             textstart = line.find('Traceback (most recent call last):')
             if textstart != -1:
                 yield line[:textstart] + highlight(line[textstart:], Fore.RED)
@@ -96,7 +102,7 @@ def highlight_traceback_lines(iterable, cwd=None):
 
         # Highlight each frame
         while True:
-            line = lines.next()
+            line = next(lines)
             column, text = line[:textstart], line[textstart:]
             match = LOCATION_RE.search(text)
             if not match:
@@ -116,9 +122,9 @@ def highlight_traceback_lines(iterable, cwd=None):
                 included = False
 
             if included:
-                lo, hi, br = (Style.DIM + Fore.RED,
-                              Style.DIM + Fore.WHITE,
-                              Style.BRIGHT + Fore.RED)
+                lo, hi, br = (Style.RESET_ALL + Style.DIM + Fore.RED,
+                              Style.RESET_ALL + Style.DIM + Fore.WHITE,
+                              Style.RESET_ALL + Style.BRIGHT + Fore.RED)
                 lopath, hipath = path[:pathindex], path[pathindex:]
                 # Highlight text
                 text = LOCATION_PATTERN.format(
@@ -127,21 +133,21 @@ def highlight_traceback_lines(iterable, cwd=None):
                     func)                         # Module name
                 yield column + lo + text + Style.RESET_ALL
                 # Highlight following line too
-                line = lines.next()
+                line = next(lines)
                 column, text = line[:textstart], line[textstart:]
                 yield column + hi + text + Style.RESET_ALL
             else:
                 # Lowlight text
                 yield column + highlight(text, Fore.RED, bright=False)
                 # Lowlight following line too
-                line = lines.next()
+                line = next(lines)
                 column, text = line[:textstart], line[textstart:]
                 yield column + highlight(text, Fore.RED, bright=False)
 
         # Highlight footer
-        text = column + highlight(text, Fore.MAGENTA)
-        #if ':' in text:
-        #    text = highlight(text, Fore.WHITE, text.find(':') + 1)
+        text = column + highlight(text, Fore.WHITE)
+        # if ':' in text:
+        #     text = highlight(text, Fore.WHITE, text.find(':') + 1)
         yield text
 
 

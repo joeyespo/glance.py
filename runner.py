@@ -1,9 +1,12 @@
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import os
 import signal
 import sys
-from Queue import Queue, Empty
+try:
+    from queue import Queue, Empty
+except ImportError:
+    from Queue import Queue, Empty
 from subprocess import Popen, PIPE
 from threading import Thread
 from time import sleep

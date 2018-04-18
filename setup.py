@@ -34,5 +34,5 @@ setup(
     packages=find_packages(),
     install_requires=read('requirements.txt').splitlines(),
     zip_safe=False,
-    entry_points={'console_scripts': ['glance = glanceback:main']},
+    entry_points={'console_scripts': ['glance = glance:main']},
 )
